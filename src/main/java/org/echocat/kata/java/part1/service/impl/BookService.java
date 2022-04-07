@@ -19,7 +19,7 @@ import java.util.stream.Stream;
  * @created 23/March/2022
  * @project java-kata-1
  */
-public class BookService implements DataReader<Book> {
+public class BookService implements DataReader<Book>, DataWriter {
     private static final String BOOKS_FILE_NAME = "books.csv";
 
     private final List<Book> books;
@@ -30,6 +30,7 @@ public class BookService implements DataReader<Book> {
         this.header = readHeader(readFileFromResources(BOOKS_FILE_NAME));
     }
 
+    @Override
     public ImmutableList<Book> readData(Stream<String> lines) {
         final List<Book> books =
                 lines
@@ -44,4 +45,32 @@ public class BookService implements DataReader<Book> {
         return books;
     }
 
+    @Override
+    public void printData() {
+        printHeader(header);
+        books.forEach(
+                book -> {
+                    StringJoiner data = new StringJoiner(" | ");
+                    data.add(book.getTitle());
+                    data.add(book.getIsbn());
+                    data.add(book.getAuthors());
+                    data.add(book.getDescription());
+                    System.out.println(data.toString());
+                });
+    }
+
+    public void findAndPrintAllBookByEmail(Set<String> emails) {
+        emails.forEach(
+                email -> {
+                    System.out.println("\nFind books by author's email:" + email);
+                    books.stream()
+                            .filter(book -> book.getAuthors().contains(email))
+                            .forEach(System.out::println);
+                    System.out.println("*********************");
+                });
+    }
+
+    public Book findAndPrintBookByIsbn(String isbn) {
+        return books.stream().filter(book -> book.getIsbn().equals(isbn)).findFirst().get();
+    }
 }
