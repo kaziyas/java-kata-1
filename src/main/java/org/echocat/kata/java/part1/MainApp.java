@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -32,8 +31,22 @@ public class MainApp {
             MagazineService magazineService = new MagazineService();
             magazineService.printData();
             magazineService.findAndPrintAllMagazineByEmail(new AuthorService().getAuthorsEmail());
+            SortingAndPrintingBooksAndMagazines(bookService.getBooks(), magazineService.getMagazines());
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void SortingAndPrintingBooksAndMagazines(List<Book> books, List<Magazine> magazines) {
+        Stream.concat(books.stream(), magazines.stream())
+                .sorted(
+                        Comparator.comparing(
+                                o -> {
+                                    if (o instanceof Book) {
+                                        return ((Book) o).getTitle();
+                                    } else {
+                                        return ((Magazine) o).getTitle();
+                                    }
+                                })).forEach(System.out::println);
     }
 }
